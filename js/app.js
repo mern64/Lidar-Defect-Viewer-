@@ -21,15 +21,6 @@ class DefectViewerApp {
     setupEventListeners() {
         console.log("Setting up event listeners...");
         
-        // Load sample data
-        const loadSampleBtn = document.getElementById('load-sample-btn');
-        if (loadSampleBtn) {
-            loadSampleBtn.addEventListener('click', () => {
-                console.log("Load Sample Data clicked");
-                this.loadSampleData();
-            });
-        }
-        
         // Load GLB model
         const loadGlbBtn = document.getElementById('load-glb-btn');
         if (loadGlbBtn) {
@@ -39,15 +30,6 @@ class DefectViewerApp {
             });
         } else {
             console.error("Load GLB button not found!");
-        }
-        
-        // Load IFC model
-        const loadIfcBtn = document.getElementById('load-ifc-btn');
-        if (loadIfcBtn) {
-            loadIfcBtn.addEventListener('click', () => {
-                console.log("Load IFC Model clicked");
-                this.openIFCUploadModal();
-            });
         }
         
         // Defect reporting
@@ -110,29 +92,6 @@ class DefectViewerApp {
         if (closeGlbModal) {
             closeGlbModal.addEventListener('click', () => {
                 this.closeGLBUploadModal();
-            });
-        }
-        
-        // IFC modal events
-        const loadIfcConfirmBtn = document.getElementById('load-ifc-confirm');
-        if (loadIfcConfirmBtn) {
-            loadIfcConfirmBtn.addEventListener('click', () => {
-                console.log("Load IFC Confirm clicked");
-                this.loadIFCModel();
-            });
-        }
-        
-        const cancelIfcBtn = document.getElementById('cancel-ifc');
-        if (cancelIfcBtn) {
-            cancelIfcBtn.addEventListener('click', () => {
-                this.closeIFCUploadModal();
-            });
-        }
-        
-        const closeIfcModal = document.querySelector('.close-ifc');
-        if (closeIfcModal) {
-            closeIfcModal.addEventListener('click', () => {
-                this.closeIFCUploadModal();
             });
         }
         
@@ -241,54 +200,6 @@ class DefectViewerApp {
         console.log("All event listeners set up successfully");
     }
     
-    async loadSampleData() {
-        this.showLoading(true, "Loading sample data...");
-        
-        try {
-            console.log("Loading sample data...");
-            
-            // Load model data
-            const modelResponse = await fetch('data/sample-model.json');
-            if (!modelResponse.ok) {
-                throw new Error(`Failed to load model data: ${modelResponse.status}`);
-            }
-            const modelData = await modelResponse.json();
-            console.log("Model data loaded:", modelData);
-            
-            // Load defects data
-            const defectsResponse = await fetch('data/defects.json');
-            if (!defectsResponse.ok) {
-                throw new Error(`Failed to load defects data: ${defectsResponse.status}`);
-            }
-            const defectsData = await defectsResponse.json();
-            console.log("Defects data loaded:", defectsData);
-            
-            if (window.smartRenderer) {
-                console.log("Loading model into renderer...");
-                // Load the 3D model
-                await window.smartRenderer.loadModel(modelData);
-                
-                // Load defects with coordinates from JSON
-                this.defects = defectsData.defects;
-                console.log("Loading defects into renderer:", this.defects.length);
-                window.smartRenderer.loadDefects(this.defects);
-                
-                this.updateProjectInfo(defectsData.metadata.project_name);
-                this.filterDefects();
-                
-                console.log("Sample data loaded successfully");
-            } else {
-                console.error("Smart renderer not available");
-            }
-            
-        } catch (error) {
-            console.error("Error loading sample data:", error);
-            alert(`Error loading sample data: ${error.message}`);
-        } finally {
-            this.showLoading(false);
-        }
-    }
-    
     openGLBUploadModal() {
         console.log("Opening GLB upload modal...");
         const modal = document.getElementById('glb-upload-modal');
@@ -364,96 +275,6 @@ class DefectViewerApp {
         } catch (error) {
             console.error("Error loading GLB model:", error);
             alert(`Error loading GLB model: ${error.message}\n\nMake sure you're using a valid GLB/GLTF file.`);
-        } finally {
-            this.showLoading(false);
-        }
-    }
-    
-    openIFCUploadModal() {
-        console.log("Opening IFC upload modal...");
-        const modal = document.getElementById('ifc-upload-modal');
-        if (modal) {
-            modal.style.display = 'block';
-            document.getElementById('ifc-file').value = '';
-            document.getElementById('ifc-model-scale').value = '1.0';
-            document.getElementById('ifc-extract-defects').checked = true;
-            console.log("IFC upload modal opened");
-        } else {
-            console.error("IFC upload modal element not found!");
-        }
-    }
-    
-    closeIFCUploadModal() {
-        console.log("Closing IFC upload modal...");
-        const modal = document.getElementById('ifc-upload-modal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    }
-    
-    async loadIFCModel() {
-        console.log("Starting IFC model loading...");
-        
-        const fileInput = document.getElementById('ifc-file');
-        const scaleInput = document.getElementById('ifc-model-scale');
-        const extractDefectsCheckbox = document.getElementById('ifc-extract-defects');
-        
-        if (!fileInput || !fileInput.files.length) {
-            alert('Please select an IFC file');
-            return;
-        }
-        
-        const file = fileInput.files[0];
-        const scale = parseFloat(scaleInput.value) || 1.0;
-        const extractDefects = extractDefectsCheckbox.checked;
-        
-        console.log("Selected file:", file.name, "Scale:", scale, "Extract defects:", extractDefects);
-        
-        if (!file.name.toLowerCase().endsWith('.ifc')) {
-            alert('Please select a valid IFC file');
-            return;
-        }
-        
-        try {
-            this.showLoading(true, `Loading IFC model: ${file.name}...`);
-            
-            if (window.smartRenderer) {
-                console.log("Loading IFC file into renderer...");
-                const result = await window.smartRenderer.loadIFCFromFile(file, scale, extractDefects);
-                
-                // If defects were extracted from IFC, use those
-                if (extractDefects && result.extractedDefects && result.extractedDefects.length > 0) {
-                    this.defects = result.extractedDefects;
-                    console.log(`Extracted ${this.defects.length} defect markers from IFC file`);
-                    window.smartRenderer.loadDefects(this.defects);
-                } else {
-                    // Otherwise, try to load from JSON
-                    console.log("Loading defects from JSON...");
-                    try {
-                        const defectsResponse = await fetch('data/defects.json');
-                        if (defectsResponse.ok) {
-                            const defectsData = await defectsResponse.json();
-                            this.defects = defectsData.defects;
-                            window.smartRenderer.loadDefects(this.defects);
-                        }
-                    } catch (e) {
-                        console.log("No defects JSON file found, continuing without defects");
-                    }
-                }
-                
-                this.updateProjectInfo(`IFC: ${file.name}`);
-                this.filterDefects();
-                
-                console.log("IFC model loaded successfully");
-            } else {
-                console.error("Smart renderer not available");
-            }
-            
-            this.closeIFCUploadModal();
-            
-        } catch (error) {
-            console.error("Error loading IFC model:", error);
-            alert(`Error loading IFC model: ${error.message}\n\nMake sure you're using a valid IFC file.`);
         } finally {
             this.showLoading(false);
         }

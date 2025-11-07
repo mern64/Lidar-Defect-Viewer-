@@ -11,9 +11,6 @@
     <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
     <!-- Cannon.js for physics -->
     <script src="https://cdn.babylonjs.com/cannon.js"></script>
-    <!-- IFC.js for IFC file support -->
-    <script src="https://unpkg.com/web-ifc@0.0.53/web-ifc-api.js"></script>
-    <script src="https://unpkg.com/web-ifc-three@0.0.124/IFCLoader.js"></script>
 </head>
 <body>
     <div class="container">
@@ -22,9 +19,7 @@
             <h1>LIDAR Defect Viewer - Smart 3D</h1>
             <div class="project-info">
                 <span id="project-name">Project: Not Loaded</span>
-                <button id="load-sample-btn" class="btn-primary">Load Sample Data</button>
                 <button id="load-glb-btn" class="btn-primary">Load GLB Model</button>
-                <button id="load-ifc-btn" class="btn-primary">Load IFC Model</button>
                 <button id="toggle-inspector" class="btn-secondary">Debug Inspector</button>
             </div>
         </header>
@@ -82,7 +77,7 @@
                 
                 <div class="defects-list" id="defects-list">
                     <div class="defect-placeholder">
-                        <p>No defects loaded. Click "Load Sample Data" to start.</p>
+                        <p>No defects loaded. Load a GLB model with defect markers to begin.</p>
                     </div>
                 </div>
 
@@ -182,32 +177,6 @@
             <div class="form-actions">
                 <button id="load-glb-confirm" class="btn-primary">Load Model</button>
                 <button id="cancel-glb" class="btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- IFC Model Upload Modal -->
-    <div id="ifc-upload-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-ifc">&times;</span>
-            <h3>Load IFC Model</h3>
-            <div class="form-group">
-                <label for="ifc-file">Select IFC File:</label>
-                <input type="file" id="ifc-file" accept=".ifc">
-            </div>
-            <div class="form-group">
-                <label for="ifc-extract-defects">
-                    <input type="checkbox" id="ifc-extract-defects" checked>
-                    Automatically extract defect markers (yellow spheres)
-                </label>
-            </div>
-            <div class="form-group">
-                <label for="ifc-model-scale">Model Scale:</label>
-                <input type="number" id="ifc-model-scale" value="1.0" step="0.1" min="0.1" max="10">
-            </div>
-            <div class="form-actions">
-                <button id="load-ifc-confirm" class="btn-primary">Load Model</button>
-                <button id="cancel-ifc" class="btn-secondary">Cancel</button>
             </div>
         </div>
     </div>
