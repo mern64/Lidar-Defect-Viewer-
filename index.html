@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIDAR Defect Viewer - Smart 3D</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Babylon.js -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <!-- Cannon.js for physics -->
+    <script src="https://cdn.babylonjs.com/cannon.js"></script>
+    <!-- IFC.js for IFC file support -->
+    <script src="https://unpkg.com/web-ifc@0.0.53/web-ifc-api.js"></script>
+    <script src="https://unpkg.com/web-ifc-three@0.0.124/IFCLoader.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>LIDAR Defect Viewer - Smart 3D</h1>
+            <div class="project-info">
+                <span id="project-name">Project: Not Loaded</span>
+                <button id="load-sample-btn" class="btn-primary">Load Sample Data</button>
+                <button id="load-glb-btn" class="btn-primary">Load GLB Model</button>
+                <button id="load-ifc-btn" class="btn-primary">Load IFC Model</button>
+                <button id="toggle-inspector" class="btn-secondary">Debug Inspector</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- 3D Viewer -->
+            <div class="viewer-container">
+                <canvas id="3d-viewer"></canvas>
+                <div class="viewer-controls">
+                    <button id="reset-view">Reset View</button>
+                    <button id="toggle-defects">Show/Hide Defects</button>
+                    <button id="view-top">Top View</button>
+                    <button id="view-front">Front View</button>
+                    <button id="view-3d">3D View</button>
+                    <button id="toggle-xray">X-Ray: ON</button>
+                    <div class="model-info">
+                        <span id="model-type">Model: None</span>
+                    </div>
+                    <div class="camera-info">
+                        <span>Camera: </span>
+                        <span id="camera-position">0,0,0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Defect Panel -->
+            <div class="defect-panel">
+                <div class="panel-header">
+                    <h3>Defects List</h3>
+                    <div class="defect-stats">
+                        <span id="defect-count">0 defects</span>
+                        <button id="add-defect-btn" class="btn-secondary">Report New Defect</button>
+                    </div>
+                </div>
+                
+                <div class="defects-filter">
+                    <select id="severity-filter">
+                        <option value="all">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select id="type-filter">
+                        <option value="all">All Types</option>
+                        <option value="crack">Crack</option>
+                        <option value="water-damage">Water Damage</option>
+                        <option value="structural">Structural</option>
+                        <option value="finish">Finish</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="plumbing">Plumbing</option>
+                    </select>
+                </div>
+                
+                <div class="defects-list" id="defects-list">
+                    <div class="defect-placeholder">
+                        <p>No defects loaded. Click "Load Sample Data" to start.</p>
+                    </div>
+                </div>
+
+                <!-- Defect Details -->
+                <div class="defect-details" id="defect-details" style="display: none;">
+                    <h4>Defect Details</h4>
+                    <div id="detail-content">
+                        <!-- Details will be populated here -->
+                    </div>
+                    <button id="close-details" class="btn-secondary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Defect Modal -->
+    <div id="add-defect-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Report New Defect</h3>
+            <form id="defect-form">
+                <div class="form-group">
+                    <label for="defect-type">Defect Type:</label>
+                    <select id="defect-type" required>
+                        <option value="">Select Type</option>
+                        <option value="crack">Crack</option>
+                        <option value="water-damage">Water Damage</option>
+                        <option value="structural">Structural Issue</option>
+                        <option value="finish">Finish Defect</option>
+                        <option value="electrical">Electrical Issue</option>
+                        <option value="plumbing">Plumbing Issue</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="defect-severity">Severity:</label>
+                    <select id="defect-severity" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="defect-description">Description:</label>
+                    <textarea id="defect-description" placeholder="Describe the defect in detail..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="defect-notes">Additional Notes:</label>
+                    <textarea id="defect-notes" placeholder="Any additional notes or observations..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="defect-element">Building Element:</label>
+                    <select id="defect-element">
+                        <option value="">Select Element (Optional)</option>
+                        <option value="wall_1">North Wall</option>
+                        <option value="wall_2">South Wall</option>
+                        <option value="wall_3">East Wall</option>
+                        <option value="wall_4">West Wall</option>
+                        <option value="floor_1">Ground Floor</option>
+                        <option value="door_1">Main Entrance</option>
+                        <option value="window_1">North Window</option>
+                        <option value="window_2">South Window</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="defect-image">Upload Image:</label>
+                    <input type="file" id="defect-image" accept="image/*">
+                    <div id="image-preview" style="margin-top: 10px;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="defect-coordinates">Coordinates (click on model to set):</label>
+                    <input type="text" id="defect-coordinates" readonly placeholder="Click on the 3D model to set coordinates">
+                    <button type="button" id="clear-coordinates" class="btn-secondary">Clear</button>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Submit Defect</button>
+                    <button type="button" id="cancel-defect" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLB Model Upload Modal -->
+    <div id="glb-upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-glb">&times;</span>
+            <h3>Load GLB/GLTF Model</h3>
+            <div class="form-group">
+                <label for="glb-file">Select GLB/GLTF File:</label>
+                <input type="file" id="glb-file" accept=".glb,.gltf">
+            </div>
+            <div class="form-group">
+                <label for="model-scale">Model Scale:</label>
+                <input type="number" id="model-scale" value="1.0" step="0.1" min="0.1" max="10">
+            </div>
+            <div class="form-actions">
+                <button id="load-glb-confirm" class="btn-primary">Load Model</button>
+                <button id="cancel-glb" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IFC Model Upload Modal -->
+    <div id="ifc-upload-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-ifc">&times;</span>
+            <h3>Load IFC Model</h3>
+            <div class="form-group">
+                <label for="ifc-file">Select IFC File:</label>
+                <input type="file" id="ifc-file" accept=".ifc">
+            </div>
+            <div class="form-group">
+                <label for="ifc-extract-defects">
+                    <input type="checkbox" id="ifc-extract-defects" checked>
+                    Automatically extract defect markers (yellow spheres)
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="ifc-model-scale">Model Scale:</label>
+                <input type="number" id="ifc-model-scale" value="1.0" step="0.1" min="0.1" max="10">
+            </div>
+            <div class="form-actions">
+                <button id="load-ifc-confirm" class="btn-primary">Load Model</button>
+                <button id="cancel-ifc" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+       <!-- Your existing HTML content -->
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loading-text">Loading 3D Model and Defects...</p>
+    </div>
+
+    <!-- Scripts must be in this order -->
+    <script src="js/babylon-smart-renderer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

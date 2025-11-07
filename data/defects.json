@@ -1,0 +1,109 @@
+{
+  "defects": [
+    {
+      "id": "defect_001",
+      "element_id": "wall_1",
+      "defect_type": "structural",
+      "description": "Hairline cracks in concrete slab connection",
+      "severity": "high",
+      "coordinates": [-0.9, 0.55,  0.8],
+      "status": "open",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "notes": "Hairline cracks detected - requires monitoring",
+      "image_url": null
+    },
+    {
+      "id": "defect_002",
+      "element_id": "wall_2",
+      "defect_type": "crack",
+      "description": "Vertical crack in south wall near corner junction",
+      "severity": "medium",
+      "coordinates": [-2.8, 1.2, -4.9],
+      "status": "open",
+      "timestamp": "2024-01-16T14:20:00Z",
+      "notes": "Monitor crack width monthly",
+      "image_url": null
+    },
+    {
+      "id": "defect_003",
+      "element_id": "floor_1",
+      "defect_type": "water-damage",
+      "description": "Water staining and dampness near main entrance",
+      "severity": "high",
+      "coordinates": [0.8, 0.05, 4.2],
+      "status": "open",
+      "timestamp": "2024-01-17T09:15:00Z",
+      "notes": "Check drainage system and waterproofing",
+      "image_url": null
+    },
+    {
+      "id": "defect_004",
+      "element_id": "wall_3",
+      "defect_type": "finish",
+      "description": "Paint peeling and blistering on east wall surface",
+      "severity": "low",
+      "coordinates": [4.9, 1.8, 1.5],
+      "status": "open",
+      "timestamp": "2024-01-18T11:45:00Z",
+      "notes": "Repaint required after moisture issue resolved",
+      "image_url": null
+    },
+    {
+      "id": "defect_005",
+      "element_id": "wall_4",
+      "defect_type": "structural",
+      "description": "Hairline cracks in concrete slab connection",
+      "severity": "medium",
+      "coordinates": [-4.7, 2.1, -1.2],
+      "status": "open",
+      "timestamp": "2024-01-19T16:00:00Z",
+      "notes": "Structural movement detected - requires monitoring",
+      "image_url": null
+    },
+    {
+      "id": "defect_006",
+      "element_id": "floor_1",
+      "defect_type": "finish",
+      "description": "Tile grout cracking and discoloration in bathroom area",
+      "severity": "low",
+      "coordinates": [3.2, 0.02, -3.5],
+      "status": "open",
+      "timestamp": "2024-01-20T13:10:00Z",
+      "notes": "Regrouting needed to prevent water penetration",
+      "image_url": null
+    },
+    {
+      "id": "defect_007",
+      "element_id": "wall_1",
+      "defect_type": "water-damage",
+      "description": "Mold growth due to water leakage from roof",
+      "severity": "critical",
+      "coordinates": [1.2, 2.8, 4.9],
+      "status": "urgent",
+      "timestamp": "2024-01-21T08:30:00Z",
+      "notes": "URGENT: Health hazard - immediate remediation required",
+      "image_url": null
+    },
+    {
+      "id": "defect_008",
+      "element_id": "window_1",
+      "defect_type": "structural",
+      "description": "Window frame misalignment causing air leakage",
+      "severity": "medium",
+      "coordinates": [2.1, 1.5, 4.95],
+      "status": "open",
+      "timestamp": "2024-01-22T15:20:00Z",
+      "notes": "Frame requires realignment and sealing",
+      "image_url": null
+    }
+  ],
+  "metadata": {
+    "project_name": "Residential Building A",
+    "total_defects": 8,
+    "last_updated": "2024-01-22T15:20:00Z",
+    "critical_count": 1,
+    "high_count": 2,
+    "medium_count": 3,
+    "low_count": 2
+  }
+}
